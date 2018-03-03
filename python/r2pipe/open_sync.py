@@ -1,4 +1,9 @@
 # -*- coding: utf-8 -*-
+"""open_sync.py 
+This script use code from old __init__.py open object
+
+"""
+
 
 import re
 import socket
