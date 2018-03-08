@@ -29,9 +29,9 @@ import sys
 import time
 import socket
 import urllib
-        
-if os.name != 'nt':
-        import fcntl   
+       
+
+   
 
 try:
         import r2lang
@@ -113,19 +113,19 @@ if __name__ == "__main__":
                 #
                 #   Start 1 task
                 print("[+] Testing python r2pipe local")
-                rlocal = open("/bin/ls")
-                t = rlocal.cmd("pi 5", callback=callback)
-                rlocal.wait(t)  # Wait for task end
-                rlocal.close()
+                #rlocal = open("/bin/ls")
+                #t = rlocal.cmd("pi 5", callback=callback)
+                #rlocal.wait(t)  # Wait for task end
+                #rlocal.close()
 
                 #   Start 3 tasks with Context manager
                 print("[+] Testing python r2pipe local with 3 queries")
-                with open("/bin/ls") as rlocal:
-                        t1 = rlocal.cmd("pi 5", callback=callback)
-                        t2 = rlocal.cmd("pi 5", callback=callback)
-                        t3 = rlocal.cmd("pi 5", callback=callback)
+                #with open("/bin/ls") as rlocal:
+                 #       t1 = rlocal.cmd("pi 5", callback=callback)
+                  #      t2 = rlocal.cmd("pi 5", callback=callback)
+                   #     t3 = rlocal.cmd("pi 5", callback=callback)
 
-                        rlocal.wait([t1, t2, t3])
+                    #    rlocal.wait([t1, t2, t3])
 
                 #
                 # Test r2pipe with remote tcp process (launch it with "r2 -qc.:9080 myfile")

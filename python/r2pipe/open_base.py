@@ -192,7 +192,7 @@ class OpenBase(object):
         
         res = self._cmd(cmd, **kwargs)
         if res is not None:
-            return res.strip()
+            return res#.strip()
         return None
 
         
