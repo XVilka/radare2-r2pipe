@@ -196,15 +196,17 @@ class OpenBase(object):
         return None
 
         
-    def cmdj(self, cmd):
+    def cmdj(self, cmd, **kwargs):
         """Same as cmd() but evaluates JSONs and returns an object
         Args:
             cmd (str): r2 command
         Returns:
             Returns a Python object respresenting the parsed JSON
         """
+        result = self.cmd(cmd, **kwargs).result()
+
         try:
-            data = json.loads(self.cmd(cmd).replace('\n', ''))
+            data = json.loads(result)
         except (ValueError, KeyError, TypeError) as e:
             sys.stderr.write("r2pipe.cmdj.Error: %s\n" % (e))
             data = None

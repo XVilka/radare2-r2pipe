@@ -24,16 +24,18 @@ class open(OpenBase, ContextDecorator):
                 return False
 
         def close(self):
-                if not self._loop.is_closed():
+                if self._loop.is_running():
                         self._loop.stop()
+                if not self._loop.is_closed():
                         self._loop.close()
 
         def __init__(self, filename='', flags=[]):
                 super(open, self).__init__(filename, flags)
                 watcher = asyncio.get_child_watcher()
+                
                 self._loop = asyncio.new_event_loop()
+
                 watcher.attach_loop(self._loop)
-                #asyncio.set_event_loop(self._loop)
                 
                 if filename.startswith("http"):
                         self._cmd_coro = self._cmd_http
@@ -112,8 +114,9 @@ class open(OpenBase, ContextDecorator):
 
                 process.stdin.close()
                 process.kill()
-
-                future.set_result((b"".join(out).decode('utf-8'), callback))
+                out = b"".join(out).decode('utf-8')
+                future.set_result((out, callback))
+                return out
 
         @asyncio.coroutine
         def _cmd_http(self, cmd, future, callback):
@@ -134,7 +137,6 @@ class open(OpenBase, ContextDecorator):
                         ]).encode()
 
                         writer.write(message)
-
                         data = yield from reader.read(512)
                         res = [data]
                         while data:
@@ -151,8 +153,10 @@ class open(OpenBase, ContextDecorator):
                                         start += 1
                                         break
                                 start += len(x) + 1  # +1 because we must be count '\n'
+                        res = res[start:].decode('utf-8')
+                        future.set_result((res, callback))
+                        return res
 
-                        future.set_result((res[start:].decode(), callback))
                 except Exception as e:
                         future.set_result((str(e), callback))
 
@@ -171,10 +175,11 @@ class open(OpenBase, ContextDecorator):
                         while data:
                                 res.append(data)
                                 data = yield from reader.read(512)
-
-                        future.set_result((b''.join(res).decode(), callback))
-
+                        res = b''.join(res).decode('utf-8')
+                        future.set_result((res, callback))
                         writer.close()
+                        return res
+
                 except Exception as e:
                         future.set_result((str(e), callback))
 

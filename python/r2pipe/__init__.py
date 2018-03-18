@@ -47,12 +47,12 @@ if sys.version_info >= (3, 0):
         urlopen = urllib.request.urlopen
         import urllib.error
         URLError = urllib.error.URLError
-        from .open_async import open
+        from r2pipe.open_async import open
 else:
         import urllib2
         urlopen = urllib2.urlopen
         URLError = urllib2.URLError
-        from .open_sync import open
+        from r2pipe.open_sync import open
      
         
    
@@ -116,16 +116,17 @@ if __name__ == "__main__":
                 rlocal = open("/bin/ls")
                 t = rlocal.cmd("pi 5", callback=callback)
                 rlocal.wait(t)  # Wait for task end
+                info = rlocal.cmdj("ij")
+                rlocal.wait(info)
+                print("Architecture: " + info['bin']['machine'])
                 rlocal.close()
-
                 #   Start 3 tasks with Context manager
                 print("[+] Testing python r2pipe local with 3 queries")
-                with open("/bin/ls") as rlocal:
-                        t1 = rlocal.cmd("pi 5", callback=callback)
-                        t2 = rlocal.cmd("pi 5", callback=callback)
-                        t3 = rlocal.cmd("pi 5", callback=callback)
-
-                        rlocal.wait([t1, t2, t3])
+                with open("/bin/ls") as rlocall:
+                        t1 = rlocall.cmd("pi 5", callback=callback)
+                        t2 = rlocall.cmd("pi 5", callback=callback)
+                        t3 = rlocall.cmd("pi 5", callback=callback)
+                        rlocall.wait([t1, t2, t3])
 
                 #
                 # Test r2pipe with remote tcp process (launch it with "r2 -qc.:9080 myfile")
@@ -133,7 +134,7 @@ if __name__ == "__main__":
                 #   Start 1 task
                 print("[+] Testing python r2pipe tcp://")
                 rremote = open("tcp://127.0.0.1:9080")
-                t = rremote.cmd("pi 5", callback=callback)
+                t = rremote.cmd("pi 5",callback=callback)
                 rremote.wait(t)
                 rremote.close()
 
@@ -158,7 +159,7 @@ if __name__ == "__main__":
                 #   Start 3 tasks with Context manager
                 print("[+] Testing python r2pipe http:// with 3 queries")
                 with open("http://127.0.0.1:9090") as rremote:
-                        t1 = rremote.cmd("pi 5", callback=callback)
+                        t1 = rremote.cmd("pi 10", callback=callback)
                         t2 = rremote.cmd("pi 5", callback=callback)
                         t3 = rremote.cmd("pi 5", callback=callback)
 
