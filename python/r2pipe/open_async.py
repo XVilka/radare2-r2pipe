@@ -12,7 +12,6 @@ from urllib.parse import quote, urlparse
 
 from .open_base import OpenBase, get_radare_path
 
-
 class open(OpenBase, ContextDecorator):
         # --------------------------------------------------------------------------
         # Contenxt manager functions
@@ -31,9 +30,11 @@ class open(OpenBase, ContextDecorator):
 
         def __init__(self, filename='', flags=[]):
                 super(open, self).__init__(filename, flags)
-                print(filename)
+                watcher = asyncio.get_child_watcher()
                 self._loop = asyncio.new_event_loop()
-
+                watcher.attach_loop(self._loop)
+                #asyncio.set_event_loop(self._loop)
+                
                 if filename.startswith("http"):
                         self._cmd_coro = self._cmd_http
                         self.uri = "/cmd"
@@ -57,12 +58,14 @@ class open(OpenBase, ContextDecorator):
                         self._port = r.group(2)
 
                 else:
+                        
                         self._cmd_coro = self._cmd_process
-
+                         
                         cmd = ["-q0", filename]
                         cmd = cmd[:1] + flags + cmd[1:]
                         self._process_start_cmd = cmd
                         self._processes = []
+                        
 
         def _callback_wrapper(self, future):
                 result, callback = future.result()
@@ -71,10 +74,8 @@ class open(OpenBase, ContextDecorator):
                         callback(result)
 
         def _cmd(self, cmd, **kwargs):
-                print(cmd, kwargs)
                 # Get callback, if available
                 callback = kwargs.get("callback")
-                
                 future = asyncio.Future(loop=self._loop)
                 future.add_done_callback(self._callback_wrapper)
 
@@ -82,7 +83,6 @@ class open(OpenBase, ContextDecorator):
 
                 # Create and start a new task (coroutine)
                 self._loop.run_until_complete(task)
-
                 return task
 
         @asyncio.coroutine
