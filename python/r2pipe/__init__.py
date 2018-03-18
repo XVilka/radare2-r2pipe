@@ -47,12 +47,12 @@ if sys.version_info >= (3, 0):
         urlopen = urllib.request.urlopen
         import urllib.error
         URLError = urllib.error.URLError
-        from r2pipe.open_async import open
+        from .open_async import open
 else:
         import urllib2
         urlopen = urllib2.urlopen
         URLError = urllib2.URLError
-        from r2pipe.open_sync import open
+        from .open_sync import open
      
         
    
